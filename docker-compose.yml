@@ -1,0 +1,44 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15
+    container_name: validation_db
+    restart: always
+    environment:
+      POSTGRES_DB: validation_db
+      POSTGRES_USER: symfony
+      POSTGRES_PASSWORD: symfony
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      
+  backend:
+    build:
+      context: ./docker/php
+    container_name: validation_backend
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    command: >
+      sh -c "composer install &&
+      sleep 5 && 
+      symfony server:start --no-tls --allow-all-ip --port=8000"
+
+  frontend:
+    image: node:20
+    container_name: validation_frontend
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5173:5173"
+    command: sh -c "npm install && npm run dev -- --host"
+
+volumes:
+ postgres_data:
