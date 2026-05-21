@@ -26,19 +26,24 @@ services:
     depends_on:
       - db
     command: >
-      sh -c "composer install &&
-      sleep 5 && 
-      symfony server:start --no-tls --allow-all-ip --port=8000"
+      sh -c "composer install && php -S 0.0.0.0:8000 -t public"
+
+
 
   frontend:
-    image: node:20
+    build:
+      context: ./docker/node
     container_name: validation_frontend
     working_dir: /app
     volumes:
       - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
     ports:
       - "5173:5173"
-    command: sh -c "npm install && npm run dev -- --host"
+    environment:
+      NODE_EXTRA_CA_CERTS: /usr/local/share/ca-certificates/zscaler-root.crt
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5173 --strictPort"
 
 volumes:
  postgres_data:
+ frontend_node_modules:

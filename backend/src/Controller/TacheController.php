@@ -2,11 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Tache;
-use App\Repository\TacheRepository;
-use App\Repository\CampagneValidationRepository;
-use App\Repository\UtilisateurRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\TacheService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,118 +12,63 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/api/taches')]
 class TacheController extends AbstractController
 {
-    // ✅ LISTE DES TACHES
+    public function __construct(
+        private TacheService $tacheService
+    ) {}
+
+    // ✅ LISTE
     #[Route('', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
-    public function index(TacheRepository $repo): JsonResponse
+    public function index(): JsonResponse
     {
-        $taches = $repo->findAll();
+        $taches = $this->tacheService->findAll();
 
         return $this->json($taches, 200, [], ['groups' => 'tache:list']);
     }
 
-    // ✅ DETAIL TACHE
+    // ✅ DETAIL
     #[Route('/{id}', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
-    public function show(Tache $tache): JsonResponse
+    public function show(int $id): JsonResponse
     {
+        $tache = $this->tacheService->findOne($id);
+
         return $this->json($tache, 200, [], ['groups' => 'tache:detail']);
     }
 
-    // ✅ CREATION TACHE
+    // ✅ CREATE
     #[Route('', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
-    public function create(
-        Request $request,
-        EntityManagerInterface $em,
-        CampagneValidationRepository $campagneRepo,
-        UtilisateurRepository $userRepo
-    ): JsonResponse {
+    public function create(Request $request): JsonResponse
+    {
         $data = json_decode($request->getContent(), true);
 
-        $tache = new Tache();
+        // ✅ on injecte l'utilisateur connecté
+        $data['createur'] = $this->getUser();
 
-        $tache->setTitre($data['titre']);
-        $tache->setDescription($data['description'] ?? null);
-        $tache->setStatut($data['statut']);
-        $tache->setPriorite($data['priorite'] ?? null);
-
-        $tache->setDateDebut(
-            isset($data['dateDebut']) ? new \DateTime($data['dateDebut']) : null
-        );
-        $tache->setDateEcheance(
-            isset($data['dateEcheance']) ? new \DateTime($data['dateEcheance']) : null
-        );
-
-        // ✅ Créateur = utilisateur connecté
-        $tache->setCreateur($this->getUser());
-
-        // ✅ Lien campagne
-        if (!empty($data['campagneId'])) {
-            $campagne = $campagneRepo->find($data['campagneId']);
-            $tache->setCampagne($campagne);
-        }
-
-        // ✅ Assignation
-        if (!empty($data['assigneA'])) {
-            $user = $userRepo->find($data['assigneA']);
-            $tache->setAssigneA($user);
-        }
-
-        $tache->setDateCreation(new \DateTime());
-
-        $em->persist($tache);
-        $em->flush();
+        $tache = $this->tacheService->create($data);
 
         return $this->json($tache, 201, [], ['groups' => 'tache:detail']);
     }
 
-    // ✅ EDIT TACHE
+    // ✅ UPDATE
     #[Route('/{id}', methods: ['PUT'])]
     #[IsGranted('ROLE_USER')]
-    public function update(
-        Tache $tache,
-        Request $request,
-        EntityManagerInterface $em,
-        UtilisateurRepository $userRepo
-    ): JsonResponse {
+    public function update(int $id, Request $request): JsonResponse
+    {
         $data = json_decode($request->getContent(), true);
 
-        if (isset($data['titre'])) {
-            $tache->setTitre($data['titre']);
-        }
-
-        if (isset($data['description'])) {
-            $tache->setDescription($data['description']);
-        }
-
-        if (isset($data['statut'])) {
-            $tache->setStatut($data['statut']);
-        }
-
-        if (isset($data['priorite'])) {
-            $tache->setPriorite($data['priorite']);
-        }
-
-        if (isset($data['assigneA'])) {
-            $user = $userRepo->find($data['assigneA']);
-            $tache->setAssigneA($user);
-        }
-
-        $tache->setDateModification(new \DateTime());
-
-        $em->flush();
+        $tache = $this->tacheService->update($id, $data);
 
         return $this->json($tache, 200, [], ['groups' => 'tache:detail']);
     }
 
-    // ✅ DELETE TACHE
+    // ✅ DELETE
     #[Route('/{id}', methods: ['DELETE'])]
     #[IsGranted('ROLE_USER')]
-    public function delete(Tache $tache, EntityManagerInterface $em): JsonResponse
+    public function delete(int $id): JsonResponse
     {
-        $em->remove($tache);
-        $em->flush();
+        $this->tacheService->delete($id);
 
         return $this->json([
             'message' => 'Tâche supprimée'

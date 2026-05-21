@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Override;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
 class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
@@ -16,27 +17,34 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['tache:detail'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
+    #[Groups(['tache:detail'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
     private ?string $passwordHash = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['tache:detail'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['tache:detail'])]
     private ?string $prenom = null;
 
     #[ORM\Column(length: 100, nullable: true)]
+    #[Groups(['tache:detail'])]
     private ?string $fonction = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['tache:detail'])]
     private ?bool $disponibilite = null;
 
     #[ORM\Column(length: 20, nullable: true)]
+    #[Groups(['tache:detail'])]
     private ?string $telephone = null;
 
     #[ORM\Column]
@@ -156,12 +164,16 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
     #[Override]
     public function getUserIdentifier(): string
     {
         return (string) $this->email;
     }
-    public function eraseCredentials(): void {}
+
+    public function eraseCredentials(): void
+    {
+    }
 
     #[Override]
     public function getPassword(): ?string
@@ -190,7 +202,6 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     public function removecampagnesResponsable(CampagneValidation $campagnesResponsable): static
     {
         if ($this->campagnesResponsables->removeElement($campagnesResponsable)) {
-            // set the owning side to null (unless already changed)
             if ($campagnesResponsable->getResponsable() === $this) {
                 $campagnesResponsable->setResponsable(null);
             }

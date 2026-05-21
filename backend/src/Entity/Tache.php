@@ -5,7 +5,7 @@ namespace App\Entity;
 use App\Repository\TacheRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: TacheRepository::class)]
 class Tache
@@ -13,43 +13,56 @@ class Tache
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['tache:list', 'tache:detail'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['tache:list', 'tache:detail'])]
     private ?string $titre = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['tache:detail'])]
     private ?string $description = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['tache:list', 'tache:detail'])]
     private ?string $statut = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['tache:list', 'tache:detail'])]
     private ?string $priorite = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['tache:detail'])]
     private ?\DateTime $dateDebut = null;
 
     #[ORM\Column]
+    #[Groups(['tache:list', 'tache:detail'])]
     private ?\DateTime $dateCreation = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['tache:detail'])]
     private ?\DateTime $dateEcheance = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['tache:detail'])]
     private ?\DateTime $dateFin = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['tache:detail'])]
     private ?\DateTime $dateModification = null;
 
     #[ORM\ManyToOne]
+    #[Groups(['tache:detail'])]
     private ?CampagneValidation $campagne = null;
 
     #[ORM\ManyToOne]
+    #[Groups(['tache:detail'])]
     private ?Utilisateur $assigneA = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['tache:detail'])]
     private ?Utilisateur $createur = null;
 
     public function getId(): ?int
