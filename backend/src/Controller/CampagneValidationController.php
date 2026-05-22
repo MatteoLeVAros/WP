@@ -16,11 +16,17 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class CampagneValidationController extends AbstractController
 {
     // ✅ LISTE DES CAMPAGNES
-    #[Route('', name: 'campagne_list', methods: ['GET'])]
+    #[Route('', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
-    public function index(CampagneValidationRepository $repo): JsonResponse
+    public function index(Request $Request, CampagneValidationRepository $campagneValidationRepository): JsonResponse 
     {
-        $campagnes = $repo->findAll();
+        $filters = [
+            'statut' => $Request->query->get('statut'),
+            'priorite' => $Request->query->get('priorite'),
+            'responsable' => $Request->query->get('responsable'),
+            'search' => $Request->query->get('search'),
+        ];
+        $campagnes = $campagneValidationRepository->search($filters);
 
         return $this->json($campagnes, 200, [], ['groups' => 'campagne:list']);
     }

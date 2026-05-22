@@ -147,9 +147,9 @@ class TacheService
     }
 
     // ✅ FIND ALL
-    public function findAll(): array
+    public function search(array $filters): array
     {
-        return $this->tacheRepository->findBy([], ['dateCreation' => 'DESC']);
+        return $this->tacheRepository->search($filters);
     }
 
     // ✅ FIND ONE

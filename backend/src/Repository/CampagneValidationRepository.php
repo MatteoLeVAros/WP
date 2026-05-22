@@ -15,7 +15,35 @@ class CampagneValidationRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, CampagneValidation::class);
     }
+        public function search(array $filters): array
+        {
+            $qb = $this->createQueryBuilder('c');
 
+            if (!empty($filters['statut'])) {
+                $qb->andWhere('c.statut = :statut')
+                ->setParameter('statut', $filters['statut']);
+            }
+
+            if (!empty($filters['priorite'])) {
+                $qb->andWhere('c.priorite = :priorite')
+                ->setParameter('priorite', $filters['priorite']);
+            }
+
+            if (!empty($filters['responsable'])) {
+                $qb->andWhere('c.responsable = :responsable')
+                ->setParameter('responsable', $filters['responsable']);
+            }
+
+            if (!empty($filters['search'])) {
+                $qb->andWhere('c.titre LIKE :search')
+                ->setParameter('search', '%' . $filters['search'] . '%');
+            }
+
+            return $qb
+                ->orderBy('c.dateCreation', 'DESC')
+                ->getQuery()
+                ->getResult();
+        }
     //    /**
     //     * @return CampagneValidation[] Returns an array of CampagneValidation objects
     //     */

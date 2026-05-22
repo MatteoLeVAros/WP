@@ -15,6 +15,40 @@ class TacheRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Tache::class);
     }
+        public function search(array $filters): array
+        {
+            $qb = $this->createQueryBuilder('t');
+
+            if (!empty($filters['statut'])) {
+                $qb->andWhere('t.statut = :statut')
+                    ->setParameter('statut', $filters['statut']);
+            }
+
+            if (!empty($filters['priorite'])) {
+                $qb->andWhere('t.priorite = :priorite')
+                    ->setParameter('priorite', $filters['priorite']);
+            }
+
+            if (!empty($filters['assigneA'])) {
+                $qb->andWhere('t.assigneA = :assigneA')
+                    ->setParameter('assigneA', $filters['assigneA']);
+            }
+
+            if (!empty($filters['campagne'])) {
+                $qb->andWhere('t.campagne = :campagne')
+                    ->setParameter('campagne', $filters['campagne']);
+            }
+
+            if (!empty($filters['search'])) {
+                $qb->andWhere('t.titre LIKE :search')
+                    ->setParameter('search', '%' . $filters['search'] . '%');
+            }
+
+            return $qb
+                ->orderBy('t.dateCreation', 'DESC')
+                ->getQuery()
+                ->getResult();
+        }
 
 //    /**
 //     * @return Tache[] Returns an array of Tache objects

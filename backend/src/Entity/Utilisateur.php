@@ -17,34 +17,34 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['tache:detail'])]
+    #[Groups(['tache:detail', 'campagne:detail', 'notification:detail', 'commentaire:detail', 'user:detail'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Groups(['tache:detail'])]
+    #[Groups(['tache:detail', 'campagne:detail', 'notification:detail', 'commentaire:detail', 'user:detail'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
     private ?string $passwordHash = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(['tache:detail'])]
+    #[Groups(['tache:detail', 'campagne:detail', 'notification:detail', 'commentaire:detail', 'user:detail'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(['tache:detail'])]
+    #[Groups(['tache:detail', 'campagne:detail', 'notification:detail', 'commentaire:detail', 'user:detail'])]
     private ?string $prenom = null;
 
     #[ORM\Column(length: 100, nullable: true)]
-    #[Groups(['tache:detail'])]
+    #[Groups(['tache:detail', 'campagne:detail', 'notification:detail', 'commentaire:detail', 'user:detail'])]
     private ?string $fonction = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['tache:detail'])]
+    #[Groups(['tache:detail', 'campagne:detail', 'notification:detail', 'commentaire:detail', 'user:detail'])]
     private ?bool $disponibilite = null;
 
     #[ORM\Column(length: 20, nullable: true)]
-    #[Groups(['tache:detail'])]
+    #[Groups(['tache:detail', 'campagne:detail', 'notification:detail', 'commentaire:detail', 'user:detail'])]
     private ?string $telephone = null;
 
     #[ORM\Column]

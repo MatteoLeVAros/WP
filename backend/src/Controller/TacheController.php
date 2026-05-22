@@ -19,9 +19,16 @@ class TacheController extends AbstractController
     // ✅ LISTE
     #[Route('', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $taches = $this->tacheService->findAll();
+        $filters = [
+            'statut' => $request->query->get('statut'),
+            'priorite' => $request->query->get('priorite'),
+            'assigneA' => $request->query->get('assigneA'),
+            'campagne' => $request->query->get('campagne'),
+            'search' => $request->query->get('search'),
+        ];
+        $taches = $this->tacheService->search($filters);
 
         return $this->json($taches, 200, [], ['groups' => 'tache:list']);
     }

@@ -5,7 +5,7 @@ namespace App\Entity;
 use App\Repository\CampagneValidationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: CampagneValidationRepository::class)]
 class CampagneValidation
@@ -13,46 +13,60 @@ class CampagneValidation
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['campagne:list', 'campagne:detail', 'commentaire:detail'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['campagne:list', 'campagne:detail', 'commentaire:detail'])]
     private ?string $referenceCampagne = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['campagne:list', 'campagne:detail', 'commentaire:detail'])]
     private ?string $titre = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['campagne:detail'])]
     private ?string $description = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['campagne:list', 'campagne:detail', 'commentaire:detail'])]
     private ?string $statut = null;
 
     #[ORM\Column(length: 20, nullable: true)]
+    #[Groups(['campagne:list', 'campagne:detail', 'commentaire:detail'])]
     private ?string $priorite = null;
 
     #[ORM\Column]
+    #[Groups(['campagne:list', 'campagne:detail'])]
     private ?\DateTime $dateDebutPrevue = null;
 
     #[ORM\Column]
+    #[Groups(['campagne:list', 'campagne:detail'])]
     private ?\DateTime $dateFinPrevue = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['campagne:detail'])]
     private ?\DateTime $dateDebutReelle = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['campagne:detail'])]
     private ?\DateTime $dateFinReelle = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['campagne:detail'])]
     private ?string $commentaireGlobal = null;
 
     #[ORM\Column]
+    #[Groups(['campagne:list', 'campagne:detail'])]
     private ?\DateTime $dateCreation = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['campagne:detail'])]
     private ?\DateTime $dateModification = null;
 
     #[ORM\ManyToOne(inversedBy: 'campagnesResponsables')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['campagne:detail'])]
     private ?Utilisateur $responsable = null;
 
     public function getId(): ?int

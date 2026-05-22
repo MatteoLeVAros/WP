@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\NotificationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: NotificationRepository::class)]
 class Notification
@@ -12,37 +13,48 @@ class Notification
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['notification:list', 'notification:detail'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['notification:list', 'notification:detail'])]
     private ?string $typeNotification = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['notification:list', 'notification:detail'])]
     private ?string $titre = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['notification:detail'])]
     private ?string $message = null;
 
     #[ORM\Column(length: 20)]
+    #[Groups(['notification:list', 'notification:detail'])]
     private ?string $canal = null;
 
     #[ORM\Column]
+    #[Groups(['notification:list', 'notification:detail'])]
     private ?bool $estLue = null;
 
     #[ORM\Column]
+    #[Groups(['notification:list', 'notification:detail'])]
     private ?\DateTime $dateEnvoi = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['notification:detail'])]
     private ?\DateTime $dateLecture = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Utilisateur $uilisateur = null;
+    #[Groups(['notification:detail'])]
+    private ?Utilisateur $utilisateur = null;
 
     #[ORM\ManyToOne]
+    #[Groups(['notification:detail'])]
     private ?Tache $tache = null;
 
     #[ORM\ManyToOne]
+    #[Groups(['notification:detail'])]
     private ?CampagneValidation $campagne = null;
 
     public function getId(): ?int
@@ -134,14 +146,14 @@ class Notification
         return $this;
     }
 
-    public function getUilisateur(): ?Utilisateur
+    public function getUtilisateur(): ?Utilisateur
     {
-        return $this->uilisateur;
+        return $this->utilisateur;
     }
 
-    public function setUilisateur(?Utilisateur $uilisateur): static
+    public function setUtilisateur(?Utilisateur $utilisateur): static
     {
-        $this->uilisateur = $uilisateur;
+        $this->utilisateur = $utilisateur;
 
         return $this;
     }

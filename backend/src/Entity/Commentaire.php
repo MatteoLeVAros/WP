@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\CommentaireRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: CommentaireRepository::class)]
 class Commentaire
@@ -12,29 +13,38 @@ class Commentaire
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['commentaire:list', 'commentaire:detail'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['commentaire:list', 'commentaire:detail'])]
     private ?string $contenu = null;
 
     #[ORM\Column]
+    #[Groups(['commentaire:list', 'commentaire:detail'])]
     private ?\DateTime $dateCreation = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['commentaire:detail'])]
     private ?\DateTime $dateModification = null;
 
     #[ORM\Column]
+    #[Groups(['commentaire:list', 'commentaire:detail'])]
     private ?bool $modere = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['commentaire:detail'])]
     private ?Utilisateur $auteur = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['commentaire:detail'])]
     private ?CampagneValidation $campagne = null;
 
     #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['commentaire:detail'])]
     private ?Tache $tache = null;
 
     public function getId(): ?int

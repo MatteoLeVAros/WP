@@ -13,11 +13,11 @@ class Tache
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['tache:list', 'tache:detail'])]
+    #[Groups(['tache:list', 'tache:detail', 'commentaire:detail'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['tache:list', 'tache:detail'])]
+    #[Groups(['tache:list', 'tache:detail', 'commentaire:detail'])]
     private ?string $titre = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -25,11 +25,11 @@ class Tache
     private ?string $description = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['tache:list', 'tache:detail'])]
+    #[Groups(['tache:list', 'tache:detail', 'commentaire:detail'])]
     private ?string $statut = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['tache:list', 'tache:detail'])]
+    #[Groups(['tache:list', 'tache:detail', 'commentaire:detail'])]
     private ?string $priorite = null;
 
     #[ORM\Column(nullable: true)]
