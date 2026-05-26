@@ -4,6 +4,7 @@ import RegisterPage from "../pages/RegisterPage";
 import ProfilePage from "../pages/ProfilePage";
 import ProtectedRoute from "../components/ProtectedRoute";
 import TachesPage from "../pages/TachesPage";
+import CampagnesPage from "../pages/CampagnesPage";
 
 export default function AppRouter() {
   return (
@@ -16,7 +17,9 @@ export default function AppRouter() {
           path="/"
           element={
             <ProtectedRoute>
+              <ProfilePage />
               <TachesPage />
+              <CampagnesPage />
             </ProtectedRoute>
           }
         />
