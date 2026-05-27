@@ -56,9 +56,16 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: CampagneValidation::class, mappedBy: 'responsable')]
     private Collection $campagnesResponsables;
 
+    /**
+     * @var Collection<int, DemandeIntervention>
+     */
+    #[ORM\OneToMany(targetEntity: DemandeIntervention::class, mappedBy: 'demandeur')]
+    private Collection $demandeInterventions;
+
     public function __construct()
     {
         $this->campagnesResponsables = new ArrayCollection();
+        $this->demandeInterventions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -204,6 +211,36 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         if ($this->campagnesResponsables->removeElement($campagnesResponsable)) {
             if ($campagnesResponsable->getResponsable() === $this) {
                 $campagnesResponsable->setResponsable(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DemandeIntervention>
+     */
+    public function getDemandeInterventions(): Collection
+    {
+        return $this->demandeInterventions;
+    }
+
+    public function addDemandeIntervention(DemandeIntervention $demandeIntervention): static
+    {
+        if (!$this->demandeInterventions->contains($demandeIntervention)) {
+            $this->demandeInterventions->add($demandeIntervention);
+            $demandeIntervention->setDemandeur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDemandeIntervention(DemandeIntervention $demandeIntervention): static
+    {
+        if ($this->demandeInterventions->removeElement($demandeIntervention)) {
+            // set the owning side to null (unless already changed)
+            if ($demandeIntervention->getDemandeur() === $this) {
+                $demandeIntervention->setDemandeur(null);
             }
         }
 

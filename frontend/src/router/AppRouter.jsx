@@ -5,6 +5,12 @@ import ProfilePage from "../pages/ProfilePage";
 import ProtectedRoute from "../components/ProtectedRoute";
 import TachesPage from "../pages/TachesPage";
 import CampagnesPage from "../pages/CampagnesPage";
+import CampagneDetailPage from "../pages/CampagneDetailPage";
+import TacheDetailPage from "../pages/TacheDetailPage";
+import Layout from "../components/Layout";
+import DashboardPage from "../pages/DashboardPage";
+import PlanningPage from "../pages/PlanningPage";
+import DemandesInterventionPage from "../pages/DemandesInterventionPage";
 
 export default function AppRouter() {
   return (
@@ -14,15 +20,96 @@ export default function AppRouter() {
         <Route path="/register" element={<RegisterPage />} />
 
         <Route
-          path="/"
+          path="/taches"
           element={
             <ProtectedRoute>
-              <ProfilePage />
-              <TachesPage />
-              <CampagnesPage />
+              <Layout>
+                <TachesPage />
+              </Layout>
             </ProtectedRoute>
           }
         />
+                <Route
+          path="/campagnes"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <CampagnesPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/campagnes/:id"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <CampagneDetailPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/taches/:id"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <TacheDetailPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <ProfilePage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <DashboardPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/planning"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <PlanningPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/demandes-intervention"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <DemandesInterventionPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+
+
+
+
       </Routes>
     </BrowserRouter>
   );

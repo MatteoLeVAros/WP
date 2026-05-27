@@ -14,3 +14,8 @@ export const createCampagne = async (data) => {
 export const deleteCampagne = async (id) => {
   await API.delete(`/campagnes/${id}`);
 };
+
+export const getCampagne = async (id) => {
+  const res = await API.get(`/campagnes/${id}`);
+  return res.data;
+};

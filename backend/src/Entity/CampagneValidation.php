@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\CampagneValidationRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -68,6 +70,17 @@ class CampagneValidation
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['campagne:detail'])]
     private ?Utilisateur $responsable = null;
+
+    /**
+     * @var Collection<int, DemandeIntervention>
+     */
+    #[ORM\OneToMany(targetEntity: DemandeIntervention::class, mappedBy: 'campagne')]
+    private Collection $demandeInterventions;
+
+    public function __construct()
+    {
+        $this->demandeInterventions = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -226,6 +239,36 @@ class CampagneValidation
     public function setResponsable(?Utilisateur $responsable): static
     {
         $this->responsable = $responsable;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DemandeIntervention>
+     */
+    public function getDemandeInterventions(): Collection
+    {
+        return $this->demandeInterventions;
+    }
+
+    public function addDemandeIntervention(DemandeIntervention $demandeIntervention): static
+    {
+        if (!$this->demandeInterventions->contains($demandeIntervention)) {
+            $this->demandeInterventions->add($demandeIntervention);
+            $demandeIntervention->setCampagne($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDemandeIntervention(DemandeIntervention $demandeIntervention): static
+    {
+        if ($this->demandeInterventions->removeElement($demandeIntervention)) {
+            // set the owning side to null (unless already changed)
+            if ($demandeIntervention->getCampagne() === $this) {
+                $demandeIntervention->setCampagne(null);
+            }
+        }
 
         return $this;
     }

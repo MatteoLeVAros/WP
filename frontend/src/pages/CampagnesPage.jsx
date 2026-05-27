@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   getCampagnes,
   createCampagne,
@@ -16,6 +17,7 @@ export default function CampagnesPage() {
     referenceCampagne: "",
     titre: "",
     statut: "brouillon",
+    priorite: "",
     dateDebutPrevue: "",
     dateFinPrevue: "",
     responsableId: "",
@@ -39,6 +41,7 @@ export default function CampagnesPage() {
       referenceCampagne: "",
       titre: "",
       statut: "brouillon",
+      priorite: "",
       dateDebutPrevue: "",
       dateFinPrevue: "",
       responsableId: "",
@@ -48,99 +51,184 @@ export default function CampagnesPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Supprimer cette campagne ?")) return;
-
+    if (!window.confirm("Supprimer cette campagne ?")) return;
     await deleteCampagne(id);
     fetchCampagnes();
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Campagnes</h1>
-
-      {/* FILTRES */}
-      <div>
-        <select onChange={(e) => setFilters({ ...filters, statut: e.target.value })}>
-          <option value="">Tous statuts</option>
-          <option value="brouillon">Brouillon</option>
-          <option value="planifiee">Planifiée</option>
-          <option value="en_cours">En cours</option>
-          <option value="terminee">Terminée</option>
-          <option value="annulee">Annulée</option>
-        </select>
-
-        <select onChange={(e) => setFilters({ ...filters, priorite: e.target.value })}>
-          <option value="">Toutes priorités</option>
-          <option value="basse">Basse</option>
-          <option value="moyenne">Moyenne</option>
-          <option value="haute">Haute</option>
-          <option value="critique">Critique</option>
-        </select>
+    <div>
+      <div className="page__header">
+        <div>
+          <h1 className="page__title">Campagnes</h1>
+          <p className="page__subtitle">
+            Organise, filtre et pilote les campagnes de validation.
+          </p>
+        </div>
       </div>
 
-      {/* FORMULAIRE */}
-      <form onSubmit={handleCreate} style={{ marginTop: 20 }}>
-        <input
-          placeholder="Référence"
-          value={form.referenceCampagne}
-          onChange={(e) =>
-            setForm({ ...form, referenceCampagne: e.target.value })
-          }
-        />
+      <div className="grid grid--2">
+        <section className="card">
+          <h2 className="card__title">Filtres</h2>
 
-        <input
-          placeholder="Titre"
-          value={form.titre}
-          onChange={(e) => setForm({ ...form, titre: e.target.value })}
-        />
+          <div className="toolbar">
+            <select
+              className="select"
+              value={filters.statut}
+              onChange={(e) =>
+                setFilters({ ...filters, statut: e.target.value })
+              }
+            >
+              <option value="">Tous statuts</option>
+              <option value="brouillon">Brouillon</option>
+              <option value="planifiee">Planifiée</option>
+              <option value="en_cours">En cours</option>
+              <option value="terminee">Terminée</option>
+              <option value="annulee">Annulée</option>
+            </select>
 
-        <select
-          value={form.statut}
-          onChange={(e) => setForm({ ...form, statut: e.target.value })}
-        >
-          <option value="brouillon">Brouillon</option>
-          <option value="planifiee">Planifiée</option>
-          <option value="en_cours">En cours</option>
-          <option value="terminee">Terminée</option>
-          <option value="annulee">Annulée</option>
-        </select>
+            <select
+              className="select"
+              value={filters.priorite}
+              onChange={(e) =>
+                setFilters({ ...filters, priorite: e.target.value })
+              }
+            >
+              <option value="">Toutes priorités</option>
+              <option value="basse">Basse</option>
+              <option value="moyenne">Moyenne</option>
+              <option value="haute">Haute</option>
+              <option value="critique">Critique</option>
+            </select>
+          </div>
+        </section>
 
-        <input
-          type="datetime-local"
-          value={form.dateDebutPrevue}
-          onChange={(e) =>
-            setForm({ ...form, dateDebutPrevue: e.target.value })
-          }
-        />
+        <section className="card">
+          <h2 className="card__title">Créer une campagne</h2>
 
-        <input
-          type="datetime-local"
-          value={form.dateFinPrevue}
-          onChange={(e) =>
-            setForm({ ...form, dateFinPrevue: e.target.value })
-          }
-        />
+          <form className="form-grid" onSubmit={handleCreate}>
+            <input
+              className="input"
+              placeholder="Référence"
+              value={form.referenceCampagne}
+              onChange={(e) =>
+                setForm({ ...form, referenceCampagne: e.target.value })
+              }
+            />
 
-        <input
-          placeholder="Responsable ID"
-          value={form.responsableId}
-          onChange={(e) =>
-            setForm({ ...form, responsableId: e.target.value })
-          }
-        />
+            <input
+              className="input"
+              placeholder="Titre"
+              value={form.titre}
+              onChange={(e) => setForm({ ...form, titre: e.target.value })}
+            />
 
-        <button type="submit">Créer</button>
-      </form>
+            <select
+              className="select"
+              value={form.statut}
+              onChange={(e) => setForm({ ...form, statut: e.target.value })}
+            >
+              <option value="brouillon">Brouillon</option>
+              <option value="planifiee">Planifiée</option>
+              <option value="en_cours">En cours</option>
+              <option value="terminee">Terminée</option>
+              <option value="annulee">Annulée</option>
+            </select>
 
-      {/* LISTE */}
-      <ul style={{ marginTop: 20 }}>
-        {campagnes.map((c) => (
-          <li key={c.id}>
-            <strong>{c.titre}</strong> ({c.statut})
-            <button onClick={() => handleDelete(c.id)}>Supprimer</button>
-          </li>
-        ))}
-      </ul>
+            <select
+              className="select"
+              value={form.priorite}
+              onChange={(e) => setForm({ ...form, priorite: e.target.value })}
+            >
+              <option value="">Priorité</option>
+              <option value="basse">Basse</option>
+              <option value="moyenne">Moyenne</option>
+              <option value="haute">Haute</option>
+              <option value="critique">Critique</option>
+            </select>
+
+            <input
+              className="input"
+              type="datetime-local"
+              value={form.dateDebutPrevue}
+              onChange={(e) =>
+                setForm({ ...form, dateDebutPrevue: e.target.value })
+              }
+            />
+
+            <input
+              className="input"
+              type="datetime-local"
+              value={form.dateFinPrevue}
+              onChange={(e) =>
+                setForm({ ...form, dateFinPrevue: e.target.value })
+              }
+            />
+
+            <input
+              className="input"
+              placeholder="Responsable ID"
+              value={form.responsableId}
+              onChange={(e) =>
+                setForm({ ...form, responsableId: e.target.value })
+              }
+            />
+
+            <button className="btn btn--primary" type="submit">
+              Créer
+            </button>
+          </form>
+        </section>
+      </div>
+
+      <section className="card" style={{ marginTop: 20 }}>
+        <h2 className="card__title">Liste des campagnes</h2>
+
+        {campagnes.length === 0 ? (
+          <div className="empty-state">Aucune campagne trouvée.</div>
+        ) : (
+          <div className="table-wrap">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Référence</th>
+                  <th>Titre</th>
+                  <th>Statut</th>
+                  <th>Priorité</th>
+                  <th>Date création</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {campagnes.map((c) => (
+                  <tr key={c.id}>
+                    <td>{c.referenceCampagne}</td>
+                    <td>
+                      <Link to={`/campagnes/${c.id}`}>{c.titre}</Link>
+                    </td>
+                    <td>{c.statut}</td>
+                    <td>{c.priorite || "-"}</td>
+                    <td>
+                      {c.dateCreation
+                        ? new Date(c.dateCreation).toLocaleString()
+                        : "-"}
+                    </td>
+                    <td>
+                      <button
+                        className="btn btn--danger"
+                        onClick={() => handleDelete(c.id)}
+                      >
+                        Supprimer
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </div>
   );
 }

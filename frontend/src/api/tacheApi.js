@@ -14,4 +14,11 @@ export const createTache = async (data) => {
 export const deleteTache = async (id) => {
   await API.delete(`/taches/${id}`);
 };
+
+
+export const getTache = async (id) => {
+  const res = await API.get(`/taches/${id}`);
+  return res.data;
+};
+
  
