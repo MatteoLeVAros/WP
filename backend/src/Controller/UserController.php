@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use App\Repository\UtilisateurRepository;
 
 #[Route('/api')]
 class UserController extends AbstractController
@@ -18,6 +19,17 @@ class UserController extends AbstractController
         private UserService $userService
     ) {
     }
+
+    
+    #[Route('/users', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function index(UtilisateurRepository $utilisateurRepository): JsonResponse
+    {
+        $users = $utilisateurRepository->findBy([], ['nom' => 'ASC']);
+
+        return $this->json($users, 200, [], ['groups' => ['user:list']]);
+    }
+
 
     #[Route('/me', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]

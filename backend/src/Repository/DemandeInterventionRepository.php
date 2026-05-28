@@ -26,8 +26,8 @@ class DemandeInterventionRepository extends ServiceEntityRepository
             ->setParameter('user', $userId)
             ->orderBy('d.dateCreation', 'DESC')
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
+
    }
 
 //    public function findOneBySomeField($value): ?DemandeIntervention

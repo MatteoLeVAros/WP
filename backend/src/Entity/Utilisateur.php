@@ -17,30 +17,30 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['tache:detail', 'campagne:detail', 'notification:detail', 'commentaire:detail', 'user:detail'])]
+    #[Groups(['tache:detail', 'campagne:detail', 'notification:detail', 'commentaire:detail', 'user:detail', 'user:list'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Groups(['tache:detail', 'campagne:detail', 'notification:detail', 'commentaire:detail', 'user:detail'])]
+    #[Groups(['tache:detail', 'campagne:detail', 'notification:detail', 'commentaire:detail', 'user:detail', 'user:list'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
     private ?string $passwordHash = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(['tache:detail', 'campagne:detail', 'notification:detail', 'commentaire:detail', 'user:detail'])]
+    #[Groups(['tache:detail', 'campagne:detail', 'notification:detail', 'commentaire:detail', 'user:detail', 'user:list'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(['tache:detail', 'campagne:detail', 'notification:detail', 'commentaire:detail', 'user:detail'])]
+    #[Groups(['tache:detail', 'campagne:detail', 'notification:detail', 'commentaire:detail', 'user:detail', 'user:list'])]
     private ?string $prenom = null;
 
     #[ORM\Column(length: 100, nullable: true)]
-    #[Groups(['tache:detail', 'campagne:detail', 'notification:detail', 'commentaire:detail', 'user:detail'])]
+    #[Groups(['tache:detail', 'campagne:detail', 'notification:detail', 'commentaire:detail', 'user:detail', 'user:list'])]
     private ?string $fonction = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['tache:detail', 'campagne:detail', 'notification:detail', 'commentaire:detail', 'user:detail'])]
+    #[Groups(['tache:detail', 'campagne:detail', 'notification:detail', 'commentaire:detail', 'user:detail', 'user:list'])]
     private ?bool $disponibilite = null;
 
     #[ORM\Column(length: 20, nullable: true)]

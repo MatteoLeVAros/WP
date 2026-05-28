@@ -25,8 +25,22 @@ export default function DemandesInterventionPage() {
   });
 
   const fetchDemandes = async () => {
-    const data = await getDemandesIntervention();
-    setDemandes(data);
+    try {
+      const data = await getDemandesIntervention();
+      // LOG 1 : On regarde la tronche de la réponse globale (Utile si c'est du API Platform / Hydra)
+      console.log("1. Réponse brute de l'API :", data);
+      
+      // Si les données sont enveloppées dans hydra:member (API Platform), on les extrait
+      if (data && data["hydra:member"]) {
+        setDemandes(data["hydra:member"]);
+      } else if (Array.isArray(data)) {
+        setDemandes(data);
+      } else {
+        setDemandes([]);
+      }
+    } catch (error) {
+      console.error("Erreur fetch :", error);
+    }
   };
 
   useEffect(() => {
@@ -35,32 +49,52 @@ export default function DemandesInterventionPage() {
 
   const handleCreate = async (e) => {
     e.preventDefault();
-    await createDemandeIntervention(form);
 
-    setForm({
-      typeIntervention: "",
-      projetNumeroMoyenValidation: "",
-      systeme: "",
-      emplacementMoyenBadge: "",
-      dureeIntervention: "",
-      dateDemarrageSouhaitee: "",
-      dateLimiteLivraison: "",
-      nombreIntervenants: 1,
-      besoinConducteurPermisC: "",
-      lienStockagePvalLogs: "",
-      statutInstrumentation: "",
-      lienTemplateChecklist: "",
-      versionSwValider: "",
-      canEnregistrer: "",
-    });
+    const payload = {
+      ...form,
+      nombreIntervenants: parseInt(form.nombreIntervenants, 10) || 1,
+      dateDemarrageSouhaitee: form.dateDemarrageSouhaitee ? `${form.dateDemarrageSouhaitee}T00:00:00Z` : null,
+      dateLimiteLivraison: form.dateLimiteLivraison ? `${form.dateLimiteLivraison}T00:00:00Z` : null,
+    };
 
-    fetchDemandes();
+    try {
+      await createDemandeIntervention(payload);
+
+      setForm({
+        typeIntervention: "",
+        projetNumeroMoyenValidation: "",
+        systeme: "",
+        emplacementMoyenBadge: "",
+        dureeIntervention: "",
+        dateDemarrageSouhaitee: "",
+        dateLimiteLivraison: "",
+        nombreIntervenants: 1,
+        besoinConducteurPermisC: "",
+        lienStockagePvalLogs: "",
+        statutInstrumentation: "",
+        lienTemplateChecklist: "",
+        versionSwValider: "",
+        canEnregistrer: "",
+      });
+
+      fetchDemandes();
+    } catch (error) {
+      console.error("Erreur lors de la création :", error);
+    }
   };
 
   const handleDelete = async (id) => {
+    if (!id) {
+      alert("Impossible de supprimer : l'identifiant est introuvable.");
+      return;
+    }
     if (!window.confirm("Supprimer cette demande ?")) return;
-    await deleteDemandeIntervention(id);
-    fetchDemandes();
+    try {
+      await deleteDemandeIntervention(id);
+      fetchDemandes();
+    } catch (error) {
+      console.error("Erreur lors de la suppression :", error);
+    }
   };
 
   return (
@@ -145,20 +179,33 @@ export default function DemandesInterventionPage() {
                 </tr>
               </thead>
               <tbody>
-                {demandes.map((d) => (
-                  <tr key={d.id}>
-                    <td>{d.typeIntervention}</td>
-                    <td>{d.systeme}</td>
-                    <td>{d.dateDemarrageSouhaitee}</td>
-                    <td>{d.dateLimiteLivraison}</td>
-                    <td>{d.statutDemande}</td>
-                    <td>
-                      <button className="btn btn--danger" onClick={() => handleDelete(d.id)}>
-                        Supprimer
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {demandes.map((d, index) => {
+                  // Extraction sécurisée de l'ID
+                  const currentId = d.id || d.idDemande || d.id_demande;
+                  
+                  // LOG 2 : On affiche un objet précis pour voir ses clés
+                  if (index === 0) {
+                    console.log("2. Structure d'une seule demande :", d);
+                  }
+
+                  return (
+                    <tr key={currentId || index}>
+                      <td>{d.typeIntervention || d.type_intervention || "N/A"}</td>
+                      <td>{d.systeme || "N/A"}</td>
+                      <td>{d.dateDemarrageSouhaitee || d.date_demarrage_souhaitee || "-"}</td>
+                      <td>{d.dateLimiteLivraison || d.date_limite_livraison || "-"}</td>
+                      <td>{d.statutDemande || d.statut_demande || d.statut || "-"}</td>
+                      <td>
+                        <button 
+                          className="btn btn--danger" 
+                          onClick={() => handleDelete(currentId)}
+                        >
+                          Supprimer
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

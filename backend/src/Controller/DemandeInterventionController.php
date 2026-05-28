@@ -30,7 +30,7 @@ class DemandeInterventionController extends AbstractController
 
         $demandes = $this->demandeService->findForUser($user);
 
-        return $this->json($demandes, 200, [], ['groups' => 'demande:list']);
+        return $this->json($demandes, 200, [], ['groups' => ['demande:list']]);
     }
 
     #[Route('/{id}', methods: ['GET'])]
@@ -39,7 +39,7 @@ class DemandeInterventionController extends AbstractController
     {
         $demande = $this->demandeService->findOne($id);
 
-        return $this->json($demande, 200, [], ['groups' => 'demande:detail']);
+        return $this->json($demande, 200, [], ['groups' => ['demande:detail']]);
     }
 
     #[Route('', methods: ['POST'])]
@@ -58,7 +58,7 @@ class DemandeInterventionController extends AbstractController
 
         $demande = $this->demandeService->create($data, $user);
 
-        return $this->json($demande, 201, [], ['groups' => 'demande:detail']);
+        return $this->json($demande, 201, [], ['groups' => ['demande:detail']]);
     }
 
     #[Route('/{id}', methods: ['PUT'])]
@@ -77,7 +77,7 @@ class DemandeInterventionController extends AbstractController
 
         $demande = $this->demandeService->update($id, $data, $user);
 
-        return $this->json($demande, 200, [], ['groups' => 'demande:detail']);
+        return $this->json($demande, 200, [], ['groups' => ['demande:detail']]);
     }
 
     #[Route('/{id}', methods: ['DELETE'])]

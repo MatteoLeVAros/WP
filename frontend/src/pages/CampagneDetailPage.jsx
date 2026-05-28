@@ -56,6 +56,23 @@ export default function CampagneDetailPage() {
       <p>Référence: {campagne.referenceCampagne}</p>
 
       <hr />
+      <hr />
+
+      <h2>Demandes d’intervention liées</h2>
+
+      {campagne.demandeInterventions?.length > 0 ? (
+        <ul>
+          {campagne.demandeInterventions.map((d) => (
+            <li key={d.id}>
+              <strong>{d.typeIntervention}</strong> — {d.systeme} —{" "}
+              {d.projetNumeroMoyenValidation} — statut : {d.statutDemande}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>Aucune demande liée à cette campagne.</p>
+      )}
+
 
       {/* ✅ Commentaires */}
       <h2>Commentaires</h2>

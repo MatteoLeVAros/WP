@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\DemandeInterventionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: DemandeInterventionRepository::class)]
 class DemandeIntervention
@@ -12,57 +13,75 @@ class DemandeIntervention
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['demande:list', 'demande:detail', 'campagne:detail'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['demande:list', 'demande:detail', 'campagne:detail'])]
     private ?string $typeIntervention = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['demande:list', 'demande:detail', 'campagne:detail'])]
     private ?string $projetNumeroMoyenValidation = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['demande:list', 'demande:detail', 'campagne:detail'])]
     private ?string $systeme = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['demande:list', 'demande:detail', 'campagne:detail'])]
     private ?string $emplacementMoyenBadge = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['demande:list', 'demande:detail'])]
     private ?string $dureeIntervention = null;
 
     #[ORM\Column]
+    #[Groups(['demande:list', 'demande:detail', 'campagne:detail'])]
     private ?\DateTime $dateDemarrageSouhaitee = null;
 
     #[ORM\Column]
+    #[Groups(['demande:list', 'demande:detail', 'campagne:detail'])]
     private ?\DateTime $dateLimiteLivraison = null;
 
     #[ORM\Column]
+    #[Groups(['demande:list', 'demande:detail'])]
     private ?int $nombreIntervenants = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['demande:list', 'demande:detail'])]
     private ?string $besoinConducteurPermisC = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['demande:list', 'demande:detail'])]
     private ?string $lienStockagePvalLogs = null;
 
     #[ORM\Column(length: 100)]
-    private ?string $statusInstrumentation = null;
+    #[Groups(['demande:list', 'demande:detail'])]
+    private ?string $statutInstrumentation = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['demande:list', 'demande:detail'])]
     private ?string $lienTemplateChecklist = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['demande:list', 'demande:detail'])]
     private ?string $versionSwValider = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $canEnregister = null;
+    #[Groups(['demande:list', 'demande:detail'])]
+    private ?string $canEnregistrer = null;
 
     #[ORM\Column(length: 30, nullable: true)]
+    #[Groups(['demande:list', 'demande:detail', 'campagne:detail'])]
     private ?string $statutDemande = null;
 
     #[ORM\Column]
+    #[Groups(['demande:detail'])]
     private ?\DateTime $dateCreation = null;
 
     #[ORM\Column]
+    #[Groups(['demande:detail'])]
     private ?\DateTime $dateModification = null;
 
     #[ORM\ManyToOne(inversedBy: 'demandeInterventions')]
@@ -71,6 +90,8 @@ class DemandeIntervention
 
     #[ORM\ManyToOne(inversedBy: 'demandeInterventions')]
     private ?CampagneValidation $campagne = null;
+
+
 
     public function getId(): ?int
     {
@@ -197,14 +218,14 @@ class DemandeIntervention
         return $this;
     }
 
-    public function getStatusInstrumentation(): ?string
+    public function getStatutInstrumentation(): ?string
     {
-        return $this->statusInstrumentation;
+        return $this->statutInstrumentation;
     }
 
-    public function setStatusInstrumentation(string $statusInstrumentation): static
+    public function setStatutInstrumentation(string $statutInstrumentation): static
     {
-        $this->statusInstrumentation = $statusInstrumentation;
+        $this->statutInstrumentation = $statutInstrumentation;
 
         return $this;
     }
@@ -233,14 +254,14 @@ class DemandeIntervention
         return $this;
     }
 
-    public function getCanEnregister(): ?string
+    public function getCanEnregistrer(): ?string
     {
-        return $this->canEnregister;
+        return $this->canEnregistrer;
     }
 
-    public function setCanEnregister(string $canEnregister): static
+    public function setCanEnregistrer(string $canEnregistrer): static
     {
-        $this->canEnregister = $canEnregister;
+        $this->canEnregistrer = $canEnregistrer;
 
         return $this;
     }
@@ -303,5 +324,11 @@ class DemandeIntervention
         $this->campagne = $campagne;
 
         return $this;
+    }
+
+    public function __construct()
+    {
+        $this->dateCreation = new \DateTime();
+        $this->dateModification = new \DateTime();
     }
 }

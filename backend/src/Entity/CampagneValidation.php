@@ -75,6 +75,7 @@ class CampagneValidation
      * @var Collection<int, DemandeIntervention>
      */
     #[ORM\OneToMany(targetEntity: DemandeIntervention::class, mappedBy: 'campagne')]
+    #[Groups(['campagne:detail'])]
     private Collection $demandeInterventions;
 
     public function __construct()

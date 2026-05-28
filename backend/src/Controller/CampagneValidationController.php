@@ -28,7 +28,7 @@ class CampagneValidationController extends AbstractController
         ];
         $campagnes = $campagneValidationRepository->search($filters);
 
-        return $this->json($campagnes, 200, [], ['groups' => 'campagne:list']);
+        return $this->json($campagnes, 200, [], ['groups' => ['campagne:list']]);
     }
 
     // ✅ DETAIL CAMPAGNE
@@ -36,41 +36,77 @@ class CampagneValidationController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function show(CampagneValidation $campagne): JsonResponse
     {
-        return $this->json($campagne, 200, [], ['groups' => 'campagne:detail']);
+        return $this->json($campagne, 200, [], ['groups' => ['campagne:detail']]);
     }
 
     // ✅ CREATION CAMPAGNE
     #[Route('', name: 'campagne_create', methods: ['POST'])]
-    #[IsGranted('ROLE_USER')]
-    public function create(
-        Request $request,
-        EntityManagerInterface $em,
-        UtilisateurRepository $userRepo
-    ): JsonResponse {
-        $data = json_decode($request->getContent(), true);
+#[IsGranted('ROLE_USER')]
+public function create(
+    Request $request,
+    EntityManagerInterface $em,
+    UtilisateurRepository $userRepo,
+    \App\Repository\DemandeInterventionRepository $demandeRepo
+): JsonResponse {
+    $data = json_decode($request->getContent(), true);
 
-        $campagne = new CampagneValidation();
-
-        // Remplissage
-        $campagne->setReferenceCampagne($data['referenceCampagne']);
-        $campagne->setTitre($data['titre']);
-        $campagne->setDescription($data['description'] ?? null);
-        $campagne->setStatut($data['statut']);
-        $campagne->setPriorite($data['priorite'] ?? null);
-        $campagne->setDateDebutPrevue(new \DateTime($data['dateDebutPrevue']));
-        $campagne->setDateFinPrevue(new \DateTime($data['dateFinPrevue']));
-        $campagne->setCommentaireGlobal($data['commentaireGlobal'] ?? null);
-
-        // ✅ Responsable = utilisateur connecté
-        $campagne->setResponsable($this->getUser());
-
-        $campagne->setDateCreation(new \DateTime());
-
-        $em->persist($campagne);
-        $em->flush();
-
-        return $this->json($campagne, 201, [], ['groups' => 'campagne:detail']);
+    if (!is_array($data)) {
+        return $this->json(['message' => 'Body JSON invalide'], 400);
     }
+
+    $required = ['referenceCampagne', 'titre', 'statut', 'dateDebutPrevue', 'dateFinPrevue'];
+    foreach ($required as $field) {
+        if (!isset($data[$field]) || $data[$field] === '') {
+            return $this->json(['message' => sprintf('Le champ "%s" est obligatoire.', $field)], 400);
+        }
+    }
+
+    $campagne = new CampagneValidation();
+
+    $campagne->setReferenceCampagne($data['referenceCampagne']);
+    $campagne->setTitre($data['titre']);
+    $campagne->setDescription($data['description'] ?? null);
+    $campagne->setStatut($data['statut']);
+    $campagne->setPriorite($data['priorite'] ?? null);
+    $campagne->setDateDebutPrevue(new \DateTime($data['dateDebutPrevue']));
+    $campagne->setDateFinPrevue(new \DateTime($data['dateFinPrevue']));
+    $campagne->setCommentaireGlobal($data['commentaireGlobal'] ?? null);
+    $campagne->setDateCreation(new \DateTime());
+
+    // Responsable / technicien assigné
+    if (!empty($data['responsableId'])) {
+        $responsable = $userRepo->find((int) $data['responsableId']);
+
+        if (!$responsable) {
+            return $this->json(['message' => 'Responsable introuvable'], 404);
+        }
+
+        $campagne->setResponsable($responsable);
+    } else {
+        // fallback : utilisateur connecté
+        $campagne->setResponsable($this->getUser());
+    }
+
+    // Liaison avec une demande d’intervention
+    if (!empty($data['demandeInterventionId'])) {
+        $demande = $demandeRepo->find((int) $data['demandeInterventionId']);
+
+        if (!$demande) {
+            return $this->json(['message' => 'Demande intervention introuvable'], 404);
+        }
+
+        $campagne->addDemandeIntervention($demande);
+
+        // Optionnel mais très utile métier
+        $demande->setStatutDemande('planifiee');
+        $demande->setDateModification(new \DateTime());
+    }
+
+    $em->persist($campagne);
+    $em->flush();
+
+    return $this->json($campagne, 201, [], ['groups' => ['campagne:detail']]);
+}
 
     // ✅ UPDATE CAMPAGNE
     #[Route('/{id}', name: 'campagne_update', methods: ['PUT'])]
@@ -110,7 +146,7 @@ class CampagneValidationController extends AbstractController
 
         $em->flush();
 
-        return $this->json($campagne, 200, [], ['groups' => 'campagne:detail']);
+        return $this->json($campagne, 200, [], ['groups' => ['campagne:detail']]);
     }
 
     // ✅ DELETE CAMPAGNE
