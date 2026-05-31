@@ -22,7 +22,7 @@ export default function CampagnesPage() {
   const [form, setForm] = useState({
     referenceCampagne: "",
     titre: "",
-    statut: "brouillon",
+    statut: "planifiee",
     priorite: "",
     dateDebutPrevue: "",
     dateFinPrevue: "",
@@ -80,7 +80,7 @@ export default function CampagnesPage() {
     setForm({
       referenceCampagne: "",
       titre: "",
-      statut: "brouillon",
+      statut: "planifiee",
       priorite: "",
       dateDebutPrevue: "",
       dateFinPrevue: "",
@@ -130,6 +130,10 @@ export default function CampagnesPage() {
       );
     }
   };
+  const demandesAPlanifier = demandes.filter(
+    (d) =>
+      d.statutDemande === "soumise"
+  );
 
   return (
     <div>
@@ -231,7 +235,6 @@ export default function CampagnesPage() {
               value={form.statut}
               onChange={(e) => setForm({ ...form, statut: e.target.value })}
             >
-              <option value="brouillon">Brouillon</option>
               <option value="planifiee">Planifiée</option>
               <option value="en_cours">En cours</option>
               <option value="terminee">Terminée</option>
@@ -330,10 +333,10 @@ export default function CampagnesPage() {
 
         {/* Bloc 2 */}
         <section className="card">
-          <h2 className="card__title">Toutes les demandes d’intervention</h2>
+          <h2 className="card__title">Demandes d’intervention à planifier</h2>
 
-          {demandes.length === 0 ? (
-            <div className="empty-state">Aucune demande trouvée.</div>
+          {demandesAPlanifier.length === 0 ? (
+            <div className="empty-state">Aucune demande à planifier.</div>
           ) : (
             <div className="table-wrap">
               <table className="table">
@@ -349,7 +352,7 @@ export default function CampagnesPage() {
                 </thead>
 
                 <tbody>
-                  {demandes.map((d) => (
+                  {demandesAPlanifier.map((d) => (
                     <tr key={d.id}>
                       <td>{d.id}</td>
                       <td>{d.typeIntervention || "-"}</td>

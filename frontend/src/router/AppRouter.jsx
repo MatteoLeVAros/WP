@@ -11,6 +11,7 @@ import Layout from "../components/Layout";
 import DashboardPage from "../pages/DashboardPage";
 import PlanningPage from "../pages/PlanningPage";
 import DemandesInterventionPage from "../pages/DemandesInterventionPage";
+import RequireAdmin from "../components/RequireAdmin";
 
 export default function AppRouter() {
   return (
@@ -29,13 +30,15 @@ export default function AppRouter() {
             </ProtectedRoute>
           }
         />
-                <Route
+        <Route
           path="/campagnes"
           element={
             <ProtectedRoute>
-              <Layout>
-                <CampagnesPage />
-              </Layout>
+              <RequireAdmin>
+                <Layout>
+                  <CampagnesPage />
+                </Layout>
+              </RequireAdmin>
             </ProtectedRoute>
           }
         />
@@ -44,9 +47,9 @@ export default function AppRouter() {
           path="/campagnes/:id"
           element={
             <ProtectedRoute>
-              <Layout>
-                <CampagneDetailPage />
-              </Layout>
+                <Layout>
+                  <CampagneDetailPage />
+                </Layout>
             </ProtectedRoute>
           }
         />

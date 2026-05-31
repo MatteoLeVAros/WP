@@ -16,11 +16,16 @@ class TacheController extends AbstractController
         private TacheService $tacheService
     ) {}
 
-    // ✅ LISTE
     #[Route('', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
     public function index(Request $request): JsonResponse
     {
+        $user = $this->getUser();
+
+        if (!$user instanceof \App\Entity\Utilisateur) {
+            return $this->json(['message' => 'Utilisateur non authentifié'], 401);
+        }
+
         $filters = [
             'statut' => $request->query->get('statut'),
             'priorite' => $request->query->get('priorite'),
@@ -28,9 +33,17 @@ class TacheController extends AbstractController
             'campagne' => $request->query->get('campagne'),
             'search' => $request->query->get('search'),
         ];
+
+        $isAdmin = in_array('ROLE_ADMIN', $user->getRoles(), true);
+
+        // Si ce n'est pas un admin, on force l'affichage uniquement de ses tâches
+        if (!$isAdmin) {
+            $filters['assigneA'] = $user->getId();
+        }
+
         $taches = $this->tacheService->search($filters);
 
-        return $this->json($taches, 200, [], ['groups' => 'tache:list']);
+        return $this->json($taches, 200, [], ['groups' => ['tache:list']]);
     }
 
     // ✅ DETAIL

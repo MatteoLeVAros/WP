@@ -140,4 +140,34 @@ class DemandeInterventionService
         $this->em->remove($demande);
         $this->em->flush();
     }
+
+    public function cancel(int $id, Utilisateur $user): DemandeIntervention
+    {
+        $demande = $this->findOne($id);
+
+        $isAdmin = in_array('ROLE_ADMIN', $user->getRoles(), true);
+        $isOwner = $demande->getDemandeur()?->getId() === $user->getId();
+
+        if (!$isAdmin && !$isOwner) {
+            throw new BadRequestHttpException("Vous ne pouvez pas annuler cette demande.");
+        }
+
+        // Empêche l'annulation si la demande est déjà affectée à une campagne
+        if ($demande->getCampagne() !== null) {
+            throw new BadRequestHttpException("Impossible d'annuler une demande déjà assignée à une campagne.");
+        }
+
+        // Évite les doubles annulations
+        if ($demande->getStatutDemande() === 'annulee') {
+            throw new BadRequestHttpException("Cette demande est déjà annulée.");
+        }
+
+        $demande->setStatutDemande('annulee');
+        $demande->setDateModification(new \DateTime());
+
+        $this->em->flush();
+
+        return $demande;
+    }
+
 }

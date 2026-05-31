@@ -1,8 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  getDemandesIntervention,
-  createDemandeIntervention,
-  deleteDemandeIntervention,
+import {  getDemandesIntervention,  createDemandeIntervention, cancelDemandeIntervention,
 } from "../api/demandeInterventionApi";
 
 export default function DemandesInterventionPage() {
@@ -27,17 +24,7 @@ export default function DemandesInterventionPage() {
   const fetchDemandes = async () => {
     try {
       const data = await getDemandesIntervention();
-      // LOG 1 : On regarde la tronche de la réponse globale (Utile si c'est du API Platform / Hydra)
-      console.log("1. Réponse brute de l'API :", data);
-      
-      // Si les données sont enveloppées dans hydra:member (API Platform), on les extrait
-      if (data && data["hydra:member"]) {
-        setDemandes(data["hydra:member"]);
-      } else if (Array.isArray(data)) {
-        setDemandes(data);
-      } else {
-        setDemandes([]);
-      }
+      setDemandes(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Erreur fetch :", error);
     }
@@ -77,23 +64,29 @@ export default function DemandesInterventionPage() {
         canEnregistrer: "",
       });
 
-      fetchDemandes();
+      await fetchDemandes();
     } catch (error) {
       console.error("Erreur lors de la création :", error);
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!id) {
-      alert("Impossible de supprimer : l'identifiant est introuvable.");
-      return;
-    }
-    if (!window.confirm("Supprimer cette demande ?")) return;
+  const handleCancel = async (id) => {
+    const confirmed = window.confirm("Voulez-vous vraiment annuler cette demande ?");
+    if (!confirmed) return;
+
     try {
-      await deleteDemandeIntervention(id);
-      fetchDemandes();
+      await cancelDemandeIntervention(id);
+      await fetchDemandes();
     } catch (error) {
-      console.error("Erreur lors de la suppression :", error);
+      console.error("Erreur lors de l’annulation :", error);
+      console.error("Status :", error.response?.status);
+      console.error("Réponse backend :", error.response?.data);
+
+      alert(
+        error.response?.data?.message ||
+        error.response?.data?.detail ||
+        "Erreur lors de l’annulation"
+      );
     }
   };
 
@@ -179,33 +172,30 @@ export default function DemandesInterventionPage() {
                 </tr>
               </thead>
               <tbody>
-                {demandes.map((d, index) => {
-                  // Extraction sécurisée de l'ID
-                  const currentId = d.id || d.idDemande || d.id_demande;
-                  
-                  // LOG 2 : On affiche un objet précis pour voir ses clés
-                  if (index === 0) {
-                    console.log("2. Structure d'une seule demande :", d);
-                  }
-
-                  return (
-                    <tr key={currentId || index}>
-                      <td>{d.typeIntervention || d.type_intervention || "N/A"}</td>
-                      <td>{d.systeme || "N/A"}</td>
-                      <td>{d.dateDemarrageSouhaitee || d.date_demarrage_souhaitee || "-"}</td>
-                      <td>{d.dateLimiteLivraison || d.date_limite_livraison || "-"}</td>
-                      <td>{d.statutDemande || d.statut_demande || d.statut || "-"}</td>
-                      <td>
-                        <button 
-                          className="btn btn--danger" 
-                          onClick={() => handleDelete(currentId)}
-                        >
-                          Supprimer
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
+                {demandes.map((d) => (
+                  <tr key={d.id}>
+                    <td>{d.typeIntervention || "N/A"}</td>
+                    <td>{d.systeme || "N/A"}</td>
+                    <td>
+                      {d.dateDemarrageSouhaitee
+                        ? new Date(d.dateDemarrageSouhaitee).toLocaleDateString("fr-FR")
+                        : "-"}
+                    </td>
+                    <td>
+                      {d.dateLimiteLivraison
+                        ? new Date(d.dateLimiteLivraison).toLocaleDateString("fr-FR")
+                        : "-"}
+                    </td>
+                    <td>{d.statutDemande || "-"}</td>
+                    <td>
+                      {d.statutDemande === "soumise" && (
+                          <button type="button" className="btn btn--secondary"  onClick={() => handleCancel(d.id)}>
+                            Annuler
+                          </button>
+                        )}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

@@ -24,7 +24,7 @@ export default function Notifications() {
   return (
     <div style={{ position: "relative" }}>
       <button onClick={() => setOpen(!open)}>
-        🔔 ({unreadCount})
+        Notifications ({unreadCount})
       </button>
 
       {open && (

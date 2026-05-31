@@ -1,50 +1,33 @@
 import { useEffect, useState } from "react";
-import { getTaches, deleteTache } from "../api/tacheApi";
+import { getTaches } from "../api/tacheApi";
 import { Link } from "react-router-dom";
 
 export default function TachesPage() {
   const [taches, setTaches] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [filters, setFilters] = useState({
     statut: "",
     priorite: "",
   });
 
   const fetchTaches = async () => {
-    const data = await getTaches(filters);
-    setTaches(data);
+    setLoading(true);
+
+    try {
+      const data = await getTaches(filters);
+      setTaches(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Erreur lors du chargement des tâches :", error);
+      setTaches([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     fetchTaches();
-  }, [filters]);
-
-
-  const handleDelete = async (id) => {
-    const confirmed = window.confirm("Supprimer cette tâche ?");
-    console.log("Suppression confirmée ?", confirmed, "id =", id);
-
-    if (!confirmed) return;
-
-    try {
-      console.log("Envoi DELETE pour tâche", id);
-      const res = await deleteTache(id);
-      console.log("DELETE OK :", res);
-
-      await fetchTaches();
-      console.log("Liste des tâches rechargée");
-    } catch (error) {
-      console.error("Erreur suppression tâche :", error);
-      console.error("Status :", error.response?.status);
-      console.error("Réponse backend :", error.response?.data);
-
-      alert(
-        error.response?.data?.message ||
-        error.response?.data?.detail ||
-        `Erreur lors de la suppression (HTTP ${error.response?.status || "?"})`
-      );
-    }
-  };
-
+  }, [filters.statut, filters.priorite]);
 
   return (
     <div>
@@ -57,7 +40,7 @@ export default function TachesPage() {
         </div>
       </div>
 
-      <div className="grid grid--2">
+      <div className="grid grid--1">
         <section className="card">
           <h2 className="card__title">Filtres</h2>
 
@@ -96,7 +79,9 @@ export default function TachesPage() {
       <section className="card" style={{ marginTop: 20 }}>
         <h2 className="card__title">Liste des tâches</h2>
 
-        {taches.length === 0 ? (
+        {loading ? (
+          <div className="empty-state">Chargement des tâches...</div>
+        ) : taches.length === 0 ? (
           <div className="empty-state">Aucune tâche trouvée.</div>
         ) : (
           <div className="table-wrap">
@@ -107,7 +92,6 @@ export default function TachesPage() {
                   <th>Statut</th>
                   <th>Priorité</th>
                   <th>Date création</th>
-                  <th>Action</th>
                 </tr>
               </thead>
 
@@ -123,14 +107,6 @@ export default function TachesPage() {
                       {tache.dateCreation
                         ? new Date(tache.dateCreation).toLocaleString()
                         : "-"}
-                    </td>
-                    <td>
-                      <button
-                        className="btn btn--danger"
-                        onClick={() => handleDelete(tache.id)}
-                      >
-                        Supprimer
-                      </button>
                     </td>
                   </tr>
                 ))}

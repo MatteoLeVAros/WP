@@ -20,6 +20,7 @@ export const updateDemandeIntervention = async (id, data) => {
   return res.data;
 };
 
-export const deleteDemandeIntervention = async (id) => {
-  await API.delete(`/demandes-intervention/${id}`);
+export const cancelDemandeIntervention = async (id) => {
+  const res = await API.patch(`/demandes-intervention/${id}/cancel`);
+  return res.data;
 };

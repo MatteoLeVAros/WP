@@ -93,4 +93,19 @@ class DemandeInterventionController extends AbstractController
 
         return $this->json(['message' => 'Demande supprimée']);
     }
+    
+    #[Route('/{id}/cancel', methods: ['PATCH'])]
+    #[IsGranted('ROLE_USER')]
+    public function cancel(int $id): JsonResponse
+    {
+        $user = $this->getUser();
+
+        if (!$user instanceof Utilisateur) {
+            return $this->json(['message' => 'Utilisateur non authentifié'], 401);
+        }
+
+        $demande = $this->demandeService->cancel($id, $user);
+
+        return $this->json($demande, 200, [], ['groups' => ['demande:detail']]);
+    }
 }

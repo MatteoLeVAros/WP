@@ -48,6 +48,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $telephone = null;
 
     #[ORM\Column]
+    #[Groups(['user:detail'])]
     private array $roles = [];
 
     /**
