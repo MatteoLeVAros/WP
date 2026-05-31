@@ -11,6 +11,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Entity\Tache;
+use App\Repository\TacheRepository;
+use App\Entity\Utilisateur;
+use App\Repository\CommentaireRepository;
 
 #[Route('/api/campagnes')]
 class CampagneValidationController extends AbstractController
@@ -25,6 +29,7 @@ class CampagneValidationController extends AbstractController
             'priorite' => $Request->query->get('priorite'),
             'responsable' => $Request->query->get('responsable'),
             'search' => $Request->query->get('search'),
+            'assigned' => $Request->query->get('assigned'),
         ];
         $campagnes = $campagneValidationRepository->search($filters);
 
@@ -101,6 +106,28 @@ public function create(
         $demande->setStatutDemande('planifiee');
         $demande->setDateModification(new \DateTime());
     }
+    // ✅ Création automatique de la tâche
+    $tache = new Tache();
+    $tache->setTitre('Intervention - ' . $campagne->getTitre());
+
+    $tache->setDescription(sprintf(
+        "Campagne : %s\nRéférence : %s\nDemande liée : %s",
+        $campagne->getTitre(),
+        $campagne->getReferenceCampagne(),
+        !empty($demande) ? ('#' . $demande->getId()) : 'aucune'
+    ));
+
+    $tache->setStatut('a_faire'); // ou 'planifiee' selon ton workflow
+    $tache->setPriorite($campagne->getPriorite());
+    $tache->setDateDebut($campagne->getDateDebutPrevue());
+    $tache->setDateEcheance($campagne->getDateFinPrevue());
+    $tache->setDateCreation(new \DateTime());
+    $tache->setCampagne($campagne);
+    $tache->setAssigneA($campagne->getResponsable());
+    $tache->setCreateur($this->getUser());
+
+    $em->persist($tache);
+
 
     $em->persist($campagne);
     $em->flush();
@@ -149,13 +176,47 @@ public function create(
         return $this->json($campagne, 200, [], ['groups' => ['campagne:detail']]);
     }
 
-    // ✅ DELETE CAMPAGNE
     #[Route('/{id}', name: 'campagne_delete', methods: ['DELETE'])]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_USER')]
     public function delete(
         CampagneValidation $campagne,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        TacheRepository $tacheRepository,
+        CommentaireRepository $commentaireRepository
     ): JsonResponse {
+        $user = $this->getUser();
+
+        if (!$user instanceof Utilisateur) {
+            return $this->json(['message' => 'Utilisateur non authentifié'], 401);
+        }
+
+        $isAdmin = in_array('ROLE_ADMIN', $user->getRoles(), true);
+        $isResponsable = $campagne->getResponsable()?->getId() === $user->getId();
+
+        if (!$isAdmin && !$isResponsable) {
+            return $this->json(['message' => 'Vous ne pouvez pas supprimer cette campagne.'], 403);
+        }
+
+        // 1) Supprimer les tâches liées
+        $taches = $tacheRepository->findByCampagne($campagne);
+        foreach ($taches as $tache) {
+            $em->remove($tache);
+        }
+
+        // 2) Supprimer les commentaires liés
+        $commentaires = $commentaireRepository->findByCampagne($campagne);
+        foreach ($commentaires as $commentaire) {
+            $em->remove($commentaire);
+        }
+
+        // 3) Détacher les demandes liées et les remettre "soumise"
+        foreach ($campagne->getDemandeInterventions() as $demande) {
+            $demande->setCampagne(null);
+            $demande->setStatutDemande('soumise');
+            $demande->setDateModification(new \DateTime());
+        }
+
+        // 4) Supprimer la campagne
         $em->remove($campagne);
         $em->flush();
 

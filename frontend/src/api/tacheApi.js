@@ -6,11 +6,6 @@ export const getTaches = async (filters = {}) => {
   return res.data;
 };
 
-export const createTache = async (data) => {
-  const res = await API.post("/taches", data);
-  return res.data;
-};
-
 export const deleteTache = async (id) => {
   await API.delete(`/taches/${id}`);
 };

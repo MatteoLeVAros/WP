@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Commentaire;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\CampagneValidation;
 
 /**
  * @extends ServiceEntityRepository<Commentaire>
@@ -15,6 +16,17 @@ class CommentaireRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Commentaire::class);
     }
+    
+    public function findByCampagne(CampagneValidation $campagne): array
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.campagne = :campagne')
+            ->setParameter('campagne', $campagne)
+            ->orderBy('c.id', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
 
     //    /**
     //     * @return Commentaire[] Returns an array of Commentaire objects

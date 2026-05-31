@@ -21,23 +21,29 @@ class CampagneValidationRepository extends ServiceEntityRepository
 
             if (!empty($filters['statut'])) {
                 $qb->andWhere('c.statut = :statut')
-                ->setParameter('statut', $filters['statut']);
+                    ->setParameter('statut', $filters['statut']);
             }
 
             if (!empty($filters['priorite'])) {
                 $qb->andWhere('c.priorite = :priorite')
-                ->setParameter('priorite', $filters['priorite']);
+                    ->setParameter('priorite', $filters['priorite']);
             }
 
             if (!empty($filters['responsable'])) {
                 $qb->andWhere('c.responsable = :responsable')
-                ->setParameter('responsable', $filters['responsable']);
+                    ->setParameter('responsable', $filters['responsable']);
             }
 
             if (!empty($filters['search'])) {
                 $qb->andWhere('c.titre LIKE :search')
-                ->setParameter('search', '%' . $filters['search'] . '%');
+                    ->setParameter('search', '%' . $filters['search'] . '%');
             }
+
+            if (!empty($filters['assigned']) && $filters['assigned'] == 1) {
+                $qb->innerJoin('c.demandeInterventions', 'd')
+                    ->addSelect('d');
+            }
+
 
             return $qb
                 ->orderBy('c.dateCreation', 'DESC')

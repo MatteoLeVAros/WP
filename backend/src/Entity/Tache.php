@@ -53,7 +53,8 @@ class Tache
     private ?\DateTime $dateModification = null;
 
     #[ORM\ManyToOne]
-    #[Groups(['tache:detail'])]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    #[Groups(['tache:list', 'tache:detail'])]
     private ?CampagneValidation $campagne = null;
 
     #[ORM\ManyToOne]

@@ -107,9 +107,28 @@ export default function CampagnesPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Supprimer cette campagne ?")) return;
-    await deleteCampagne(id);
-    fetchCampagnes();
+    const confirmed = window.confirm("Supprimer cette campagne ?");
+    console.log("Suppression confirmée ?", confirmed, "id =", id);
+
+    if (!confirmed) return;
+
+    try {
+      console.log("Envoi DELETE pour campagne", id);
+      const res = await deleteCampagne(id);
+      console.log("DELETE OK :", res);
+
+      await fetchCampagnes();
+      console.log("Liste des campagnes rechargée");
+    } catch (error) {
+      console.error("Erreur suppression campagne :", error);
+      console.error("Status :", error.response?.status);
+      console.error("Réponse backend :", error.response?.data);
+
+      alert(
+        error.response?.data?.message ||
+        `Erreur lors de la suppression (HTTP ${error.response?.status || "?"})`
+      );
+    }
   };
 
   return (
@@ -293,7 +312,7 @@ export default function CampagnesPage() {
               <button
                 className="btn btn--primary"
                 type="submit"
-                disabled={!form.demandeInterventionId}
+                disabled={!form.demandeInterventionId || !form.responsableId}
               >
                 Assigner la campagne
               </button>

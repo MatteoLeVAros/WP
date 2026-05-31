@@ -43,21 +43,6 @@ class TacheController extends AbstractController
         return $this->json($tache, 200, [], ['groups' => 'tache:detail']);
     }
 
-    // ✅ CREATE
-    #[Route('', methods: ['POST'])]
-    #[IsGranted('ROLE_USER')]
-    public function create(Request $request): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
-
-        // ✅ on injecte l'utilisateur connecté
-        $data['createur'] = $this->getUser();
-
-        $tache = $this->tacheService->create($data);
-
-        return $this->json($tache, 201, [], ['groups' => 'tache:detail']);
-    }
-
     // ✅ UPDATE
     #[Route('/{id}', methods: ['PUT'])]
     #[IsGranted('ROLE_USER')]

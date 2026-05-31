@@ -89,6 +89,7 @@ class DemandeIntervention
     private ?Utilisateur $demandeur = null;
 
     #[ORM\ManyToOne(inversedBy: 'demandeInterventions')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?CampagneValidation $campagne = null;
 
 

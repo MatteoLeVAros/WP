@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Tache;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\CampagneValidation;
 
 /**
  * @extends ServiceEntityRepository<Tache>
@@ -49,6 +50,17 @@ class TacheRepository extends ServiceEntityRepository
                 ->getQuery()
                 ->getResult();
         }
+        public function findByCampagne(CampagneValidation $campagne): array
+        {
+            return $this->createQueryBuilder('t')
+                ->andWhere('t.campagne = :campagne')
+                ->setParameter('campagne', $campagne)
+                ->orderBy('t.dateCreation', 'DESC')
+                ->getQuery()
+                ->getResult();
+        }
+
+        
 
 //    /**
 //     * @return Tache[] Returns an array of Tache objects

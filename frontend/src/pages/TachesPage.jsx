@@ -1,17 +1,11 @@
 import { useEffect, useState } from "react";
-import { getTaches, createTache, deleteTache } from "../api/tacheApi";
+import { getTaches, deleteTache } from "../api/tacheApi";
 import { Link } from "react-router-dom";
 
 export default function TachesPage() {
   const [taches, setTaches] = useState([]);
   const [filters, setFilters] = useState({
     statut: "",
-    priorite: "",
-  });
-
-  const [form, setForm] = useState({
-    titre: "",
-    statut: "a_faire",
     priorite: "",
   });
 
@@ -24,20 +18,31 @@ export default function TachesPage() {
     fetchTaches();
   }, [filters]);
 
-  const handleCreate = async (e) => {
-    e.preventDefault();
-
-    await createTache(form);
-
-    setForm({ titre: "", statut: "a_faire", priorite: "",});
-    fetchTaches();
-  };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Supprimer cette tâche ?")) return;
-return;
-    await deleteTache(id);
-    fetchTaches();
+    const confirmed = window.confirm("Supprimer cette tâche ?");
+    console.log("Suppression confirmée ?", confirmed, "id =", id);
+
+    if (!confirmed) return;
+
+    try {
+      console.log("Envoi DELETE pour tâche", id);
+      const res = await deleteTache(id);
+      console.log("DELETE OK :", res);
+
+      await fetchTaches();
+      console.log("Liste des tâches rechargée");
+    } catch (error) {
+      console.error("Erreur suppression tâche :", error);
+      console.error("Status :", error.response?.status);
+      console.error("Réponse backend :", error.response?.data);
+
+      alert(
+        error.response?.data?.message ||
+        error.response?.data?.detail ||
+        `Erreur lors de la suppression (HTTP ${error.response?.status || "?"})`
+      );
+    }
   };
 
 
@@ -45,9 +50,9 @@ return;
     <div>
       <div className="page__header">
         <div>
-          <h1 className="page__title">Tâches</h1>
+          <h1 className="page__title">Mes Tâches</h1>
           <p className="page__subtitle">
-            Consulte, filtre et crée rapidement les tâches de validation.
+            Consulte et filtre tes tâches de validation.
           </p>
         </div>
       </div>
@@ -85,46 +90,6 @@ return;
               <option value="critique">Critique</option>
             </select>
           </div>
-        </section>
-
-        <section className="card">
-          <h2 className="card__title">Créer une tâche</h2>
-
-          <form className="form-grid" onSubmit={handleCreate}>
-            <input
-              className="input"
-              placeholder="Titre"
-              value={form.titre}
-              onChange={(e) => setForm({ ...form, titre: e.target.value })}
-            />
-
-            <select
-              className="select"
-              value={form.statut}
-              onChange={(e) => setForm({ ...form, statut: e.target.value })}
-            >
-              <option value="a_faire">À faire</option>
-              <option value="en_cours">En cours</option>
-              <option value="terminee">Terminée</option>
-              <option value="bloquee">Bloquée</option>
-            </select>
-
-            <select
-              className="select"
-              value={form.priorite}
-              onChange={(e) => setForm({ ...form, priorite: e.target.value })}
-            >
-              <option value="">Priorité</option>
-              <option value="basse">Basse</option>
-              <option value="moyenne">Moyenne</option>
-              <option value="haute">Haute</option>
-              <option value="critique">Critique</option>
-            </select>
-
-            <button className="btn btn--primary" type="submit">
-              Créer
-            </button>
-          </form>
         </section>
       </div>
 

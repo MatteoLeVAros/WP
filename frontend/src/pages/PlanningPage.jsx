@@ -113,7 +113,7 @@ export default function PlanningPage() {
   const [view, setView] = useState("timeline");
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [filters, setFilters] = useState({
-    type: "",
+    type: "campagne",
     statut: "",
     priorite: "",
     search: "",
@@ -123,8 +123,12 @@ export default function PlanningPage() {
 
   const fetchPlanning = async () => {
     setLoading(true);
-    try {
-      const data = await getPlanning(filters);
+    try {    
+      const data = await getPlanning({
+        ...filters,
+        type: "campagne",
+        assigned: 1,
+      });
       setItems(data);
     } finally {
       setLoading(false);
@@ -137,11 +141,10 @@ export default function PlanningPage() {
 
   const summary = useMemo(() => {
     const campagnes = items.filter((item) => item.type === "campagne").length;
-    const taches = items.filter((item) => item.type === "tache").length;
     const enCours = items.filter((item) => item.statut === "en_cours").length;
     const critiques = items.filter((item) => item.priorite === "critique").length;
 
-    return { campagnes, taches, enCours, critiques };
+    return { campagnes, enCours, critiques };
   }, [items]);
 
   const groupedTimeline = useMemo(() => {
@@ -161,7 +164,7 @@ export default function PlanningPage() {
         <div>
           <h1 className="page__title">Planning</h1>
           <p className="page__subtitle">
-            Vue consolidée des campagnes et tâches à venir.
+            Vue des campagnes.
           </p>
         </div>
 
@@ -189,8 +192,8 @@ export default function PlanningPage() {
           <div className="planning-summary__value">{summary.campagnes}</div>
         </div>
         <div className="planning-summary__card">
-          <div className="planning-summary__label">Tâches</div>
-          <div className="planning-summary__value">{summary.taches}</div>
+          <div className="planning-summary__label">Planifiées</div>
+          <div className="planning-summary__value">{summary.planifiees}</div>
         </div>
         <div className="planning-summary__card">
           <div className="planning-summary__label">En cours</div>
@@ -211,9 +214,7 @@ export default function PlanningPage() {
             value={filters.type}
             onChange={(e) => setFilters({ ...filters, type: e.target.value })}
           >
-            <option value="">Tous les types</option>
             <option value="campagne">Campagnes</option>
-            <option value="tache">Tâches</option>
           </select>
 
           <input

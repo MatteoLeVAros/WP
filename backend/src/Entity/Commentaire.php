@@ -38,7 +38,7 @@ class Commentaire
     private ?Utilisateur $auteur = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     #[Groups(['commentaire:detail'])]
     private ?CampagneValidation $campagne = null;
 
