@@ -22,13 +22,22 @@ class UserController extends AbstractController
 
     
     #[Route('/users', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
+    #[IsGranted('ROLE_ADMIN')]
     public function index(UtilisateurRepository $utilisateurRepository): JsonResponse
     {
         $users = $utilisateurRepository->findBy([], ['nom' => 'ASC']);
 
         return $this->json($users, 200, [], ['groups' => ['user:list']]);
     }
+
+
+    #[Route('/users/{id}', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function show(Utilisateur $utilisateur): JsonResponse
+    {
+        return $this->json($utilisateur, 200, [], ['groups' => ['user:detail']]);
+    }
+
 
 
     #[Route('/me', methods: ['GET'])]

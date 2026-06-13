@@ -86,6 +86,7 @@ class DemandeIntervention
 
     #[ORM\ManyToOne(inversedBy: 'demandeInterventions')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['demande:detail', 'campagne:detail'])]
     private ?Utilisateur $demandeur = null;
 
     #[ORM\ManyToOne(inversedBy: 'demandeInterventions')]

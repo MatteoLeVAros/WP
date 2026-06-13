@@ -1,60 +1,108 @@
 .planning-page {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
 }
+
+/* =========================
+   Résumé / KPI
+========================= */
 
 .planning-summary {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 16px;
 }
 
 .planning-summary__card {
+  position: relative;
+  overflow: hidden;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
-  padding: 18px;
+  padding: 20px;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.planning-summary__card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(94, 63, 179, 0.28);
+}
+
+.planning-summary__card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--color-primary);
 }
 
 .planning-summary__label {
   color: var(--color-muted);
-  font-size: 0.9rem;
+  font-size: 0.86rem;
+  font-weight: 600;
 }
 
 .planning-summary__value {
-  font-size: 1.8rem;
-  font-weight: 700;
+  font-size: 2rem;
+  font-weight: 800;
   margin-top: 8px;
+  color: var(--color-text);
+  letter-spacing: -0.03em;
 }
+
+/* =========================
+   Filtres
+========================= */
 
 .planning-filters {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
   gap: 12px;
+  align-items: end;
 }
 
 .planning-switch {
   display: inline-flex;
-  gap: 8px;
-  background: #eef2ff;
+  gap: 4px;
+  width: fit-content;
+  background: var(--color-primary-light);
+  border: 1px solid rgba(94, 63, 179, 0.18);
   border-radius: 999px;
-  padding: 6px;
+  padding: 5px;
 }
 
 .planning-switch button {
-  padding: 8px 14px;
+  padding: 8px 15px;
   border-radius: 999px;
   background: transparent;
   color: var(--color-primary);
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.planning-switch button:hover {
+  background: rgba(255, 255, 255, 0.75);
 }
 
 .planning-switch button.is-active {
   background: var(--color-primary);
   color: white;
+  box-shadow: 0 6px 14px rgba(94, 63, 179, 0.24);
 }
+
+/* =========================
+   Timeline
+========================= */
 
 .timeline-group {
   display: flex;
@@ -63,120 +111,223 @@
 }
 
 .timeline-group__date {
-  font-size: 1rem;
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 6px 12px;
+  box-shadow: var(--shadow-sm);
 }
 
 .timeline-item {
   display: grid;
-  grid-template-columns: 110px 1fr auto;
-  gap: 16px;
+  grid-template-columns: 105px 1fr auto;
+  gap: 18px;
   align-items: start;
-  background: white;
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-primary);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
-  padding: 16px;
+  padding: 16px 18px;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.timeline-item:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(94, 63, 179, 0.3);
 }
 
 .timeline-item__meta {
   color: var(--color-muted);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
+  font-weight: 600;
 }
 
 .timeline-item__title {
-  font-weight: 700;
-  margin-bottom: 6px;
+  font-weight: 800;
+  margin-bottom: 5px;
+  color: var(--color-text);
 }
 
 .timeline-item__desc {
   color: var(--color-muted);
   font-size: 0.92rem;
+  line-height: 1.45;
 }
 
 .timeline-item__tags {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  margin-top: 10px;
+  margin-top: 12px;
 }
+
+/* Classes optionnelles si tu veux distinguer les types côté JSX */
+.timeline-item--campagne {
+  border-left-color: var(--color-primary);
+}
+
+.timeline-item--tache {
+  border-left-color: var(--color-secondary);
+}
+
+.timeline-item--urgent {
+  border-left-color: var(--color-danger);
+}
+
+/* =========================
+   Calendrier
+========================= */
 
 .calendar-toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 .calendar-toolbar__month {
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--color-text);
+  letter-spacing: -0.02em;
 }
 
 .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 8px;
-}
-
-.calendar-cell,
-.calendar-head {
-  background: white;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
 }
 
 .calendar-head {
   text-align: center;
   padding: 10px 8px;
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   color: var(--color-muted);
-  font-weight: 600;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: transparent;
+  border: none;
 }
 
 .calendar-cell {
-  min-height: 130px;
+  min-height: 132px;
   padding: 10px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.calendar-cell:hover {
+  border-color: rgba(94, 63, 179, 0.28);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
 }
 
 .calendar-cell.is-muted {
-  opacity: 0.45;
+  background: var(--color-surface-muted);
+  opacity: 0.65;
 }
 
 .calendar-cell__day {
-  font-size: 0.92rem;
-  font-weight: 700;
+  width: fit-content;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--color-text);
+  border-radius: 999px;
+  background: #f3f4f6;
+}
+
+/* Optionnel : à utiliser si tu ajoutes className="is-today" côté JSX */
+.calendar-cell.is-today {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.calendar-cell.is-today .calendar-cell__day {
+  background: var(--color-primary);
+  color: white;
 }
 
 .calendar-item {
   display: block;
-  padding: 6px 8px;
-  border-radius: 10px;
+  padding: 7px 9px;
+  border-radius: 9px;
   color: white;
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-size: 0.76rem;
+  font-weight: 700;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.12);
+  transition:
+    transform 0.18s ease,
+    filter 0.18s ease;
+}
+
+.calendar-item:hover {
+  transform: translateY(-1px);
+  filter: brightness(0.96);
 }
 
 .calendar-item--campagne {
-  background: var(--color-primary);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-primary-dark)
+  );
 }
 
 .calendar-item--tache {
-  background: var(--color-secondary);
+  background: linear-gradient(
+    135deg,
+    var(--color-secondary),
+    var(--color-secondary-dark)
+  );
 }
 
+/* =========================
+   Empty state
+========================= */
+
 .planning-empty {
-  padding: 28px 0;
+  padding: 34px 18px;
   text-align: center;
   color: var(--color-muted);
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
 }
+
+/* =========================
+   Responsive
+========================= */
 
 @media (max-width: 960px) {
   .timeline-item {
@@ -193,7 +344,28 @@
 }
 
 @media (max-width: 640px) {
+  .planning-page {
+    gap: 16px;
+  }
+
+  .planning-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .planning-filters {
+    grid-template-columns: 1fr;
+  }
+
   .calendar-grid {
     grid-template-columns: 1fr;
+  }
+
+  .calendar-cell {
+    min-height: auto;
+  }
+
+  .calendar-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }

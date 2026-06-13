@@ -26,6 +26,16 @@ export default function CampagneDetailPage() {
     fetchData();
   }, [id]);
 
+  const formatDate = (dateString) => {
+    if (!dateString) return "Non renseignée";
+
+    return new Date(dateString).toLocaleDateString("fr-FR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
+
   const handleCreateCommentaire = async (e) => {
     e.preventDefault();
 
@@ -48,33 +58,125 @@ export default function CampagneDetailPage() {
   if (!campagne) return <div>Loading...</div>;
 
   return (
-    <div style={{ padding: 20 }}>
+    <div className="page">
       <h1>{campagne.titre}</h1>
 
-      <p>Statut: {campagne.statut}</p>
-      <p>Priorité: {campagne.priorite}</p>
-      <p>Référence: {campagne.referenceCampagne}</p>
+      <p>
+        <strong>Statut :</strong> {campagne.statut || "Non renseigné"}
+      </p>
+      <p>
+        <strong>Priorité :</strong> {campagne.priorite || "Non renseignée"}
+      </p>
+      <p>
+        <strong>Référence :</strong> {campagne.referenceCampagne}
+      </p>
 
-      <hr />
       <hr />
 
       <h2>Demandes d’intervention liées</h2>
 
       {campagne.demandeInterventions?.length > 0 ? (
-        <ul>
+        <div>
           {campagne.demandeInterventions.map((d) => (
-            <li key={d.id}>
-              <strong>{d.typeIntervention}</strong> — {d.systeme} —{" "}
-              {d.projetNumeroMoyenValidation} — statut : {d.statutDemande}
-            </li>
+            <div
+              key={d.id}
+              style={{
+                marginBottom: 20,
+                padding: 16,
+                border: "1px solid #ddd",
+                borderRadius: 8,
+                backgroundColor: "#fafafa",
+              }}
+            >
+              <h3 style={{ marginTop: 0 }}>
+                Demande #{d.id} — {d.typeIntervention || "Type non renseigné"}
+              </h3>
+
+              <p>
+                <strong>Statut :</strong>{" "}
+                {d.statutDemande || "Non renseigné"}
+              </p>
+
+              <p>
+                <strong>Type d’intervention :</strong>{" "}
+                {d.typeIntervention || "Non renseigné"}
+              </p>
+
+              <p>
+                <strong>Système :</strong> {d.systeme || "Non renseigné"}
+              </p>
+
+              <p>
+                <strong>Projet / numéro moyen de validation :</strong>{" "}
+                {d.projetNumeroMoyenValidation || "Non renseigné"}
+              </p>
+
+              <p>
+                <strong>Emplacement moyen / badge :</strong>{" "}
+                {d.emplacementMoyenBadge || "Non renseigné"}
+              </p>
+
+              <p>
+                <strong>Date de démarrage souhaitée :</strong>{" "}
+                {formatDate(d.dateDemarrageSouhaitee)}
+              </p>
+
+              <p>
+                <strong>Date limite de livraison :</strong>{" "}
+                {formatDate(d.dateLimiteLivraison)}
+              </p>
+
+              <hr />
+
+              <h4>Contact demandeur</h4>
+
+              {d.demandeur ? (
+                <div>
+                  <p>
+                    <strong>Nom :</strong>{" "}
+                    {d.demandeur.prenom || ""} {d.demandeur.nom || ""}
+                  </p>
+
+                  <p>
+                    <strong>Email :</strong>{" "}
+                    {d.demandeur.email ? (
+                      <a href={`mailto:${d.demandeur.email}`}>
+                        {d.demandeur.email}
+                      </a>
+                    ) : (
+                      "Non renseigné"
+                    )}
+                  </p>
+
+                  <p>
+                    <strong>Téléphone :</strong>{" "}
+                    {d.demandeur.telephone || "Non renseigné"}
+                  </p>
+
+                  <p>
+                    <strong>Fonction :</strong>{" "}
+                    {d.demandeur.fonction || "Non renseignée"}
+                  </p>
+
+                  <p>
+                    <strong>Disponibilité :</strong>{" "}
+                    {d.demandeur.disponibilite
+                      ? "Disponible"
+                      : "Non disponible"}
+                  </p>
+                </div>
+              ) : (
+                <p>Aucun demandeur associé.</p>
+              )}
+            </div>
           ))}
-        </ul>
+        </div>
       ) : (
         <p>Aucune demande liée à cette campagne.</p>
       )}
 
+      <hr />
 
-      {/* ✅ Commentaires */}
       <h2>Commentaires</h2>
 
       <form onSubmit={handleCreateCommentaire}>
